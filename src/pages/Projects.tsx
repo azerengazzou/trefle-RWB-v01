@@ -8,6 +8,7 @@ export default function Projects() {
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [fullSizeImage, setFullSizeImage] = useState<string | null>(null);
+  const [imageLoading, setImageLoading] = useState(false);
 
   const filteredProjects =
     selectedCategory === 'Tous'
@@ -136,12 +137,21 @@ export default function Projects() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-sm max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="relative">
-              <img 
-                src={selectedProject.images[currentImageIndex]} 
-                alt={selectedProject.title} 
-                className="w-full h-80 object-cover cursor-pointer" 
-                onClick={() => setFullSizeImage(selectedProject.images[currentImageIndex])}
-              />
+              <div className="relative">
+                <img 
+                  src={selectedProject.images[currentImageIndex]} 
+                  alt={selectedProject.title} 
+                  className="w-full h-80 object-cover cursor-pointer" 
+                  onClick={() => setFullSizeImage(selectedProject.images[currentImageIndex])}
+                  onLoad={() => setImageLoading(false)}
+                  onLoadStart={() => setImageLoading(true)}
+                />
+                {imageLoading && (
+                  <div className="absolute inset-0 bg-neutral-200 flex items-center justify-center">
+                    <div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
+              </div>
               <button
                 onClick={() => setSelectedProject(null)}
                 className="absolute top-4 right-4 bg-white p-2 rounded-full hover:bg-neutral-100 transition-colors"
@@ -151,13 +161,19 @@ export default function Projects() {
               {selectedProject.images.length > 1 && (
                 <>
                   <button
-                    onClick={() => setCurrentImageIndex(prev => prev === 0 ? selectedProject.images.length - 1 : prev - 1)}
+                    onClick={() => {
+                      setImageLoading(true);
+                      setCurrentImageIndex(prev => prev === 0 ? selectedProject.images.length - 1 : prev - 1);
+                    }}
                     className="absolute left-4 top-1/2 -translate-y-1/2 bg-white p-2 rounded-full hover:bg-neutral-100 transition-colors"
                   >
                     <ChevronLeft size={20} />
                   </button>
                   <button
-                    onClick={() => setCurrentImageIndex(prev => prev === selectedProject.images.length - 1 ? 0 : prev + 1)}
+                    onClick={() => {
+                      setImageLoading(true);
+                      setCurrentImageIndex(prev => prev === selectedProject.images.length - 1 ? 0 : prev + 1);
+                    }}
                     className="absolute right-16 top-1/2 -translate-y-1/2 bg-white p-2 rounded-full hover:bg-neutral-100 transition-colors"
                   >
                     <ChevronRight size={20} />
@@ -166,7 +182,10 @@ export default function Projects() {
                     {selectedProject.images.map((_: any, index: number) => (
                       <button
                         key={index}
-                        onClick={() => setCurrentImageIndex(index)}
+                        onClick={() => {
+                          setImageLoading(true);
+                          setCurrentImageIndex(index);
+                        }}
                         className={`w-2 h-2 rounded-full transition-colors ${
                           index === currentImageIndex ? 'bg-white' : 'bg-white/50'
                         }`}
